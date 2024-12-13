@@ -1,29 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:talasuf_car_care/Components/Utilis.dart';
-
+import '../../Api_services/data/Local_services/Session.dart';
 import '../../Components/Custom_app_bar.dart';
 import 'Edit_profile.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+   ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      // appBar: AppBar(
-      //   centerTitle: false,
-      //   elevation: 0,
-      //   backgroundColor: const Color(0xFF00BF6D),
-      //   foregroundColor: Colors.white,
-      //   title: const Text("Profile"),
-      //   actions: [
-      //     IconButton(
-      //       icon: const Icon(Icons.settings_outlined),
-      //       onPressed: () {},
-      //     )
-      //   ],
-      // ),
+
       body: Column(
         children: [
           RoundedAppBar(title: 'Profile',),
@@ -33,25 +21,18 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 const ProfilePic(image: "https://i.postimg.cc/cCsYDjvj/user-2.png"),
                 Text(
-                  "Annette Black",
+                  UserData.username.toString(),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const Divider(height: 16.0 * 2),
-                const Info(
+                 Info(
                   infoKey: "User ID",
-                  info: "@annette.me",
+                  info: UserData.empCode.toString(),
                 ),
-                const Info(
-                  infoKey: "Location",
-                  info: "New York, NYC",
-                ),
-                const Info(
-                  infoKey: "Phone",
-                  info: "(239) 555-0108",
-                ),
-                const Info(
+
+                 Info(
                   infoKey: "Email Address",
-                  info: "demo@mail.com",
+                  info: UserData.email.toString(),
                 ),
                 const SizedBox(height: 16.0),
                 Align(

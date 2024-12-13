@@ -8,9 +8,9 @@ import '../../../Models/login.dart';
 class Sharedprefrence {
 
 
-  Future<void> savedata(User responsne) async {
+  Future<void> savedata(List<User> responsne) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String data = jsonEncode(responsne.toJson());
+    String data = jsonEncode(responsne.map((e) => e.toJson()).toList());
     prefs.setString("Login data", data);
     print("Save data in shared successfully");
   }
@@ -26,6 +26,40 @@ class Sharedprefrence {
        print("code: ${response.userId.toString()}");
      }
   }
+
+  Future<void> getlmsdata() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? json = prefs.getString("Login data");
+
+    if (json != null) {
+      print("data: $json");
+
+      // Decode the JSON as a list of maps
+      List<dynamic> jsonList = jsonDecode(json);
+      List<User> responseList = jsonList
+          .map((item) => User.fromJson(item as Map<String, dynamic>))
+          .toList();
+
+      // Use the first item if you only need one user
+      if (responseList.isNotEmpty) {
+        User firstUser = responseList.first;
+
+        print("response: ${firstUser.userName}");
+        UserData.setUserData(firstUser.userName, firstUser.userId, firstUser.userEmail, firstUser.userType, firstUser.userPassword);
+        print("lmsUserData.member_id : ${UserData.username}");
+      } else {
+        print("No user data available.");
+      }
+    } else {
+      print("No saved data found.");
+    }
+  }
+
+
+
+
+
+
 }
 
 

@@ -3,10 +3,18 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:talasuf_car_care/Components/Utilis.dart';
 
+import '../../Models/services.dart';
+
 
 
 class ProductDetailsScreen extends StatefulWidget {
-  const ProductDetailsScreen({super.key});
+  final ServiceResponse data;
+  final ServiceMaster data1;
+  ProductDetailsScreen({
+    required this.data,
+    required this.data1
+  });
+
 
   @override
   State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
@@ -50,7 +58,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
-      backgroundColor: const Color(0xFFF5F6F9),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -64,172 +72,195 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               shape: const CircleBorder(),
               padding: EdgeInsets.zero,
               elevation: 0,
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.primary,
             ),
             child: const Icon(
               Icons.arrow_back_ios_new,
-              color: Colors.black,
+              color: Colors.white,
               size: 20,
             ),
           ),
         ),
-        actions: [
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.favorite_border, color: Colors.black),
-                onPressed: () {
-                  // Wishlist feature logic goes here
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Added to wishlist!")),
-                  );
-                },
+
+      ),
+      body: Column(
+        children: [
+          SizedBox(height: 80,),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Image.network(widget.data1.serviceImage),
+          ),
+
+
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Container(
+
+            width: 200,
+            child: Card(
+
+              elevation: 5,
+              shadowColor: Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
               ),
-              Container(
-                margin: const EdgeInsets.only(right: 20),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Row(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "4.7",
+                    // Package Name and Description
+                    Text(
+                      widget.data1.serviceName,
                       style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(width: 4),
-                    SvgPicture.string(starIcon),
+                    SizedBox(height: 8),
+                    Text(
+                      widget.data1.serviceLongDetail,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    SizedBox(height: 16),
+
+                    // Package Details Row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Package Version
+
+                      ],
+                    ),
+
                   ],
                 ),
               ),
-            ],
-          ),
-        ],
-      ),
-      body: ListView(
-        children: [
-          ProductImages(product: product),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TopRoundedContainer(
-              color: Colors.white,
-              child: Column(
-                children: [
-                  ProductDescription(
-                    product: product,
-                    pressOnSeeMore: () {},
-                  ),
-                  const SizedBox(height: 16),
-                  // Quantity Selector
-
-                  const SizedBox(height: 10),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(
-                      children: [
-                        // Date Selection Column
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "Select Booking Date",
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            InkWell(
-                              onTap: () async {
-                                final DateTime? picked = await showDatePicker(
-                                  context: context,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime.now(),
-                                  lastDate: DateTime(2100),
-                                );
-                                if (picked != null) {
-                                  setState(() {
-                                    selectedDate = picked;
-                                  });
-                                  print("Selected date: $selectedDate"); // Debug print
-                                }
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  selectedDate == null
-                                      ? "Select a date"
-                                      : formatDate(selectedDate!),
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(width: 20),
-
-                        // Time Slot Selection Column
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Select Time Slot",
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              DropdownButtonFormField<String>(
-                                value: selectedTimeSlot,
-                                items: timeSlots.map((String time) {
-                                  return DropdownMenuItem<String>(
-                                    value: time,
-                                    child: Text(time),
-                                  );
-                                }).toList(),
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    selectedTimeSlot = newValue;
-                                  });
-                                },
-                                decoration: InputDecoration(
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                hint: const Text("Select a time slot"),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Time Slot Dropdown
-
-
-
-                ],
-              ),
             ),
           ),
+        ),
+      )
+         // ProductImages(product: widget.data),
+         //  Padding(
+         //    padding: const EdgeInsets.all(8.0),
+         //    child: TopRoundedContainer(
+         //      color: Colors.white,
+         //      child: Column(
+         //        children: [
+         //          // ProductDescription(
+         //          //   product: product,
+         //          //   pressOnSeeMore: () {},
+         //          // ),
+         //          // const SizedBox(height: 16),
+         //          // // Quantity Selector
+         //          //
+         //          // const SizedBox(height: 10),
+         //
+         //          Padding(
+         //            padding: const EdgeInsets.symmetric(horizontal: 10),
+         //            child: Row(
+         //              children: [
+         //                // Date Selection Column
+         //                Column(
+         //                  crossAxisAlignment: CrossAxisAlignment.start,
+         //                  children: [
+         //                    const Text(
+         //                      "Select Booking Date",
+         //                      style: TextStyle(
+         //                        fontSize: 13,
+         //                        fontWeight: FontWeight.bold,
+         //
+         //                      ),
+         //                    ),
+         //                    const SizedBox(height: 8),
+         //                    InkWell(
+         //                      onTap: () async {
+         //                        final DateTime? picked = await showDatePicker(
+         //                          context: context,
+         //                          initialDate: DateTime.now(),
+         //                          firstDate: DateTime.now(),
+         //                          lastDate: DateTime(2100),
+         //                        );
+         //                        if (picked != null) {
+         //                          setState(() {
+         //                            selectedDate = picked;
+         //                          });
+         //                          print("Selected date: $selectedDate"); // Debug print
+         //                        }
+         //                      },
+         //                      child: Container(
+         //                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+         //                        decoration: BoxDecoration(
+         //                          border: Border.all(color: Colors.grey),
+         //                          borderRadius: BorderRadius.circular(8),
+         //                        ),
+         //                        child: Text(
+         //                          selectedDate == null
+         //                              ? "Select a date"
+         //                              : formatDate(selectedDate!),
+         //                          style: const TextStyle(fontSize: 16),
+         //                        ),
+         //                      ),
+         //                    ),
+         //                  ],
+         //                ),
+         //                const SizedBox(width: 20),
+         //
+         //                // Time Slot Selection Column
+         //                Expanded(
+         //                  child: Column(
+         //                    crossAxisAlignment: CrossAxisAlignment.start,
+         //                    children: [
+         //                      const Text(
+         //                        "Select Time Slot",
+         //                        style: TextStyle(
+         //                          fontSize: 13,
+         //                          fontWeight: FontWeight.bold,
+         //                        ),
+         //                      ),
+         //                      const SizedBox(height: 8),
+         //                      DropdownButtonFormField<String>(
+         //                        value: selectedTimeSlot,
+         //                        items: timeSlots.map((String time) {
+         //                          return DropdownMenuItem<String>(
+         //                            value: time,
+         //                            child: Text(time),
+         //                          );
+         //                        }).toList(),
+         //                        onChanged: (String? newValue) {
+         //                          setState(() {
+         //                            selectedTimeSlot = newValue;
+         //                          });
+         //                        },
+         //                        decoration: InputDecoration(
+         //                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+         //                          border: OutlineInputBorder(
+         //                            borderRadius: BorderRadius.circular(8),
+         //                          ),
+         //                        ),
+         //                        hint: const Text("Select a time slot"),
+         //                      ),
+         //                    ],
+         //                  ),
+         //                ),
+         //              ],
+         //            ),
+         //          ),
+         //
+         //          const SizedBox(height: 20),
+         //
+         //          // Time Slot Dropdown
+         //
+         //
+         //
+         //        ],
+         //      ),
+         //    ),
+         //  ),
 
 
               // Confirm Button
@@ -239,7 +270,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       ),
       bottomNavigationBar: TopRoundedContainer(
 
-        color: Colors.white,
+        color: AppColors.primary.withOpacity(0.1),
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -300,7 +331,7 @@ class ProductImages extends StatefulWidget {
     required this.product,
   }) : super(key: key);
 
-  final Product product;
+  final ServiceResponse product;
 
   @override
   _ProductImagesState createState() => _ProductImagesState();
@@ -313,30 +344,30 @@ class _ProductImagesState extends State<ProductImages> {
     return Column(
       children: [
         SizedBox(
-          width: 238,
+
           child: AspectRatio(
-            aspectRatio: 1,
-            child: Image.network(widget.product.images[selectedImage]),
+            aspectRatio: 2,
+            child: Image.network(widget.product.response.servicemaster[0].serviceImage),
           ),
         ),
         // SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ...List.generate(
-              widget.product.images.length,
-                  (index) => SmallProductImage(
-                isSelected: index == selectedImage,
-                press: () {
-                  setState(() {
-                    selectedImage = index;
-                  });
-                },
-                image: widget.product.images[index],
-              ),
-            ),
-          ],
-        )
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.center,
+        //   children: [
+        //     ...List.generate(
+        //       widget.product.images.length,
+        //           (index) => SmallProductImage(
+        //         isSelected: index == selectedImage,
+        //         press: () {
+        //           setState(() {
+        //             selectedImage = index;
+        //           });
+        //         },
+        //         image: widget.product.images[index],
+        //       ),
+        //     ),
+        //   ],
+        // )
       ],
     );
   }

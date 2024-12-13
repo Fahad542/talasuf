@@ -39,9 +39,11 @@ dependencies:
   flutter_svg:
   firebase_core:
   intl:
+  fluttertoast: ^8.2.1
   firebase_auth:
   shared_preferences:
   http:
+  awesome_snackbar_content:
   badges:
   cloud_firestore:
   flutter_advanced_drawer:

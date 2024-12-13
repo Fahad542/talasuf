@@ -1,23 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:talasuf_car_care/Components/Utilis.dart';
-
+import '../../Api_services/data/Local_services/Session.dart';
 import '../../Components/Custom_app_bar.dart';
 
 class EditProfileScreen extends StatelessWidget {
-  const EditProfileScreen({super.key});
+   EditProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
 resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
-      // appBar: AppBar(
-      //   centerTitle: false,
-      //   elevation: 0,
-      //   backgroundColor: const Color(0xFF00BF6D),
-      //   foregroundColor: Colors.white,
-      //   title: const Text("Edit Profile"),
-      // ),
       body: Column(
         children: [
           RoundedAppBar(title: 'Edit Profile'),
@@ -31,7 +24,7 @@ resizeToAvoidBottomInset: true,
                       UserInfoEditField(
                         text: "Name",
                         child: TextFormField(
-                          initialValue: "Annette Black",
+                          initialValue: UserData.username,
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: AppColors.primary.withOpacity(0.05),
@@ -47,23 +40,7 @@ resizeToAvoidBottomInset: true,
                       UserInfoEditField(
                         text: "Email",
                         child: TextFormField(
-                          initialValue: "annette@gmail.com",
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: AppColors.primary.withOpacity(0.05),
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16.0 * 1.5, vertical: 16.0),
-                            border: const OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius: BorderRadius.all(Radius.circular(50)),
-                            ),
-                          ),
-                        ),
-                      ),
-                      UserInfoEditField(
-                        text: "Phone",
-                        child: TextFormField(
-                          initialValue: "(316) 555-0116",
+                          initialValue: UserData.email,
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: AppColors.primary.withOpacity(0.05),
@@ -77,11 +54,12 @@ resizeToAvoidBottomInset: true,
                         ),
                       ),
 
+
                       UserInfoEditField(
                         text: "Old Password",
                         child: TextFormField(
                           obscureText: true,
-                          initialValue: "demopass",
+                          initialValue: UserData.password,
                           decoration: InputDecoration(
                             suffixIcon: const Icon(
                               Icons.visibility_off,
@@ -116,7 +94,7 @@ resizeToAvoidBottomInset: true,
                       ),
 
 
-                const SizedBox(height: 16.0),
+                 SizedBox(height: 16.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [

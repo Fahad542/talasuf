@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:talasuf_car_care/Components/Utilis.dart';
+import 'package:talasuf_car_care/Screens/User/Home_screen.dart';
 import 'package:talasuf_car_care/Screens/User/Login_view.dart';
 
+import '../../Api_services/data/Local_services/Session.dart';
+
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key});
+   OnboardingScreen({super.key});
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -11,6 +14,7 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   int currentPage = 0;
+  Sharedprefrence sp =Sharedprefrence();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,8 +52,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> LoginScreen()));
+                onPressed: () async  {
+                  await sp.getlmsdata();
+                  if(UserData.empCode == null) {
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => LoginScreen()));
+                  }
+                  else {
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()));
+                  }
 
                 },
                 style: ElevatedButton.styleFrom(
@@ -160,7 +172,6 @@ List<Map<String, dynamic>> demoData = [
     "illustration": "assets/title.jpeg",
     "title": "Welcome to Talasuf",
     "text": "Your door-step car wash service! Book a car wash \n in just a few easy steps, and we’ll come to you!"
-
   },
   {
     "illustration": "assets/img.jpg",
@@ -169,7 +180,6 @@ List<Map<String, dynamic>> demoData = [
     "Step 1: Select a Service Package (e.g., Basic, Premium, etc. \n"
         "Step 2: Enter your location & address \nStep 3: Make payment & confirm your booking \n"
         "Step 4: Get your car washed at your doorstep on the selected date!"
-
   },
   {
     "illustration": "assets/img2.jpg",

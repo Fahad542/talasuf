@@ -32,20 +32,23 @@ class NetworkApiService extends BaseApiServices {
   Future getPostApiResponse( String url , dynamic data) async
   {
     var headers = {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
       'Authorization': Appurl.API_AUTH_TOKEN,
     };
+
     dynamic responseJson ;
     try {
 
       Response response = await post(
           Uri.parse(url),
-          body:  jsonEncode(data),
-          headers: headers
+          body: data,
+          headers: headers,
+
 
       ).timeout(Duration(seconds: 10));
 
       responseJson = returnResponse(response);
+
     }on SocketException {
 
       throw FetchDataException('No Internet Connection');

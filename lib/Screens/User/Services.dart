@@ -104,11 +104,11 @@ class ProductCard extends StatelessWidget {
                     ),
                     child: SvgPicture.string(
                       heartIcon,
-                      colorFilter: ColorFilter.mode(
-                          product.isFavourite
-                              ? const Color(0xFFFF4848)
-                              : const Color(0xFFDBDEE4),
-                          BlendMode.srcIn),
+                      // colorFilter: ColorFilter.mode(
+                      //     product.isFavourite
+                      //         ? const Color(0xFFFF4848)
+                      //         : const Color(0xFFDBDEE4),
+                      //     BlendMode.srcIn),
                     ),
                   ),
                 ),

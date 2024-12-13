@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
-// TODO: add flutter_svg to pubspec.yaml
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:talasuf_car_care/Components/Utilis.dart';
-
+import '../../Api_services/data/network/Api_services.dart';
+import '../../Models/services.dart';
 import 'Login_view.dart';
 import 'Profile_screen.dart';
-import 'Service_detail.dart';
 
-
-import 'package:flutter/material.dart';
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
-
+import 'Service_detail.dart';
 import 'Services.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen(    {super.key}   );
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -22,8 +19,38 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final AdvancedDrawerController _drawerController = AdvancedDrawerController();
+   ServiceResponse? data;
+   bool loading=false;
+   Api api=Api();
 
+
+
+void fecthdata() async {
+  setState(() {
+    loading =true;
+  });
+  try {
+    data = await api.services();
+    print("datasss: ${data}");
+    setState(() {
+      loading =false;
+    });
+  }
+  catch(e)
+  {
+
+    setState(
+            () {
+      loading =false;
+    });
+
+  }
+}
   @override
+  void initState() {
+    fecthdata();
+    super.initState();
+  }
   Widget build(BuildContext context) {
     return AdvancedDrawer(
       controller: _drawerController,
@@ -32,24 +59,30 @@ class _HomeScreenState extends State<HomeScreen> {
       backdropColor: AppColors.primary,
       drawer: _buildDrawer(),
       child: Scaffold(
-        // appBar: AppBar(
-        //   title: const Text('Home'),
-        //   leading: IconButton(
-        //     icon: const Icon(Icons.menu),
-        //     onPressed: () => _drawerController.showDrawer(),
-        //   ),
-        // ),
-        body: SafeArea(
+
+        body:
+        loading ?
+        Center(
+            child:
+            CircularProgressIndicator(
+                color: AppColors.primary
+            ))
+            :
+        SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.all(4),
             child: Column(
               children: [
                 HomeHeader(onTap: _drawerController.showDrawer,),
                 DiscountBanner(),
                 Categories(),
                 SpecialOffers(),
-                const SizedBox(height: 20),
-                PopularProducts(),
+                 SizedBox(height: 20),
+                PopularProducts(data: data!,),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: HorizontalListView(data: data!,),
+                ),
                 const SizedBox(height: 20),
               ],
             ),
@@ -145,6 +178,7 @@ class HomeHeader extends StatelessWidget {
     );
   }
 }
+
 class SearchField extends StatelessWidget {
   const SearchField({Key? key}) : super(key: key);
 
@@ -399,56 +433,61 @@ class SpecialOfferCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 20),
-      child: GestureDetector(
-        onTap: press,
-        child: SizedBox(
-          width: 242,
-          height: 100,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: Stack(
-              children: [
-                Image.network(
-                  image,
-                  fit: BoxFit.cover,
-                ),
-                Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.black54,
-                        Colors.black38,
-                        Colors.black26,
-                        Colors.transparent,
-                      ],
+      padding:  EdgeInsets.only(left: 20),
+      child: Container(
+      decoration: BoxDecoration(
+
+      ),
+        child: GestureDetector(
+          onTap: press,
+          child: SizedBox(
+            width: 242,
+            height: 100,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Stack(
+                children: [
+                  Image.network(
+                    image,
+                    fit: BoxFit.cover,
+                  ),
+                  Container(
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black54,
+                          Colors.black38,
+                          Colors.black26,
+                          Colors.transparent,
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 10,
-                  ),
-                  child: Text.rich(
-                    TextSpan(
-                      style: const TextStyle(color: Colors.white),
-                      children: [
-                        TextSpan(
-                          text: "$category\n",
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 10,
+                    ),
+                    child: Text.rich(
+                      TextSpan(
+                        style: const TextStyle(color: Colors.white),
+                        children: [
+                          TextSpan(
+                            text: "$category\n",
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        TextSpan(text: "$numOfBrands Brands")
-                      ],
+                          TextSpan(text: "$numOfBrands Brands")
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -490,8 +529,40 @@ class SectionTitle extends StatelessWidget {
   }
 }
 
+
+class HorizontalListView extends StatelessWidget {
+  final ServiceResponse data;
+  HorizontalListView({
+    required this.data
+});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 230, // Height of the ListView
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal, // Set the scroll direction to horizontal
+        itemCount: data.response.servicemaster.length, // Number of items in the list
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ProductCard(product: data.response.servicemaster[index], onPress: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> ProductDetailsScreen(data: data, data1: data.response.servicemaster[index],)));
+
+              print("object");
+            }),
+          );
+        },
+      ),
+    );
+  }
+}
+
 class PopularProducts extends StatelessWidget {
-  const PopularProducts({super.key});
+  final ServiceResponse data;
+   PopularProducts({
+     required this.data
+   }
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -508,34 +579,50 @@ class PopularProducts extends StatelessWidget {
             },
           ),
         ),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              ...List.generate(
-                demoProducts.length,
-                    (index) {
-                  if (demoProducts[index].isPopular) {
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: ProductCard(
-                        product: demoProducts[index],
-                        onPress: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=> ProductDetailsScreen()));
 
-                        },
-                      ),
-                    );
-                  }
-
-                  return const SizedBox
-                      .shrink(); // here by default width and height is 0
-                },
-              ),
-              const SizedBox(width: 20),
-            ],
-          ),
-        )
+        
+        // SingleChildScrollView(
+        //   scrollDirection: Axis.horizontal,
+        //   child:
+        //     ListView.builder(
+        //
+        //         itemCount: data.response.servicemaster.length,
+        //         itemBuilder: (BuildContext context , index)
+        //     {
+        //       var datas = data.response.servicemaster[index];
+        //       return
+        //         ProductCard(
+        //                         product: data.response.servicemaster[index],
+        //                         onPress: () {
+        //                           Navigator.push(context, MaterialPageRoute(builder: (context)=> ProductDetailsScreen()));
+        //                         },
+        //         );
+        //
+        //     }
+        //     )
+        //   // Row(
+        //   //   mainAxisAlignment: MainAxisAlignment.start,
+        //   //   crossAxisAlignment: CrossAxisAlignment.start,
+        //   //   children: [
+        //   //     ...List.generate(
+        //   //       data.response.servicemaster.length,
+        //   //           (index) {
+        //   //
+        //   //           return Padding(
+        //   //             padding: const EdgeInsets.only(left: 20),
+        //   //             child: ProductCard(
+        //   //               product: data.response.servicemaster[index],
+        //   //               onPress: () {
+        //   //                 Navigator.push(context, MaterialPageRoute(builder: (context)=> ProductDetailsScreen()));
+        //   //               },
+        //   //             ),
+        //   //           );
+        //   //       },
+        //   //     ),
+        //   //     const SizedBox(width: 20),
+        //   //   ],
+        //   // ),
+        // )
       ],
     );
   }
@@ -551,75 +638,91 @@ class ProductCard extends StatelessWidget {
   }) : super(key: key);
 
   final double width, aspectRetio;
-  final Product product;
+  final ServiceMaster product;
   final VoidCallback onPress;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: width,
-      child: GestureDetector(
-        onTap: onPress,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AspectRatio(
-              aspectRatio: 1.02,
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF979797).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Image.network(product.images[0]),
+      child: Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withOpacity(0.2), // Shadow color (with opacity for a softer effect)
+                blurRadius: 8, // Blur radius for the shadow
+                spreadRadius: 1, // Spread radius (how much the shadow spreads)
+                offset: Offset(2, 2), // Shadow position (X, Y offset)
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              product.title,
-              style: Theme.of(context).textTheme.bodyMedium,
-              maxLines: 2,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "\$${product.price}",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFFFF7643),
+            ],
+          ),
+          child: Column(
+            //crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+
+                Container(
+                  height: 100,
+                  width: 120,
+                  padding: const EdgeInsets.all(1),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF979797).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+
+                  child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                    child: Image.network(product.serviceImage,
+                      fit: BoxFit.cover,
+
+                    ),
                   ),
                 ),
-                InkWell(
-                  borderRadius: BorderRadius.circular(50),
-                  onTap: () {},
-                  child: Container(
-                    padding: const EdgeInsets.all(6),
-                    height: 24,
-                    width: 24,
+
+               SizedBox(height: 8),
+              Text(
+                product.serviceName,
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 5),
+              Text(
+                product.serviceShortDetail,
+            style: TextStyle(fontSize: 11),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: onPress,
+                    child:
+
+                    Container(
+                    padding: EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: product.isFavourite
-                          ? const Color(0xFFFF7643).withOpacity(0.15)
-                          : const Color(0xFF979797).withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: SvgPicture.string(
-                      heartIcon,
-                      colorFilter: ColorFilter.mode(
-                          product.isFavourite
-                              ? const Color(0xFFFF4848)
-                              : const Color(0xFFDBDEE4),
-                          BlendMode.srcIn),
-                    ),
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(8)),
+                    child:
+
+                    Text(
+                      "Book now",
+                      style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold),
+                       ),
+                      ),
                   ),
-                ),
-              ],
-            )
-          ],
+                  SizedBox(height: 3),
+
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+
   }
 }
 
@@ -649,13 +752,10 @@ class Product {
 List<Product> demoProducts = [
   Product(
     id: 1,
-    images: ["https://i.postimg.cc/c19zpJ6f/Image-Popular-Product-1.png"],
-    colors: [
-      const Color(0xFFF6625E),
-      const Color(0xFF836DB8),
-      const Color(0xFFDECB9C),
-      Colors.white,
-    ],
+    images: [ "https://i.postimg.cc/c19zpJ6f/Image-Popular-Product-1.png" ],
+
+
+    colors: [ Color(0xFFF6625E), Color(0xFF836DB8),Color(0xFFDECB9C), Colors.white ],
     title: "Wireless Controller for PS4™",
     price: 64.99,
     description: description,
@@ -682,15 +782,8 @@ List<Product> demoProducts = [
   ),
   Product(
     id: 3,
-    images: [
-      "https://i.postimg.cc/1XjYwvbv/glap.png",
-    ],
-    colors: [
-      const Color(0xFFF6625E),
-      const Color(0xFF836DB8),
-      const Color(0xFFDECB9C),
-      Colors.white,
-    ],
+    images: ["https://i.postimg.cc/1XjYwvbv/glap.png",],
+    colors: [ Color(0xFFF6625E), Color(0xFF836DB8), Color(0xFFDECB9C), Colors.white,],
     title: "Gloves XC Omega - Polygon",
     price: 36.55,
     description: description,
@@ -698,6 +791,7 @@ List<Product> demoProducts = [
     isFavourite: true,
     isPopular: true,
   ),
+
 ];
 
 const heartIcon =
